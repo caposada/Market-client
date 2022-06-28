@@ -5,7 +5,7 @@ export function getVariantBaseOnMarketDataStatus(status: MarketDataStatus) {
         case MarketDataStatus.OKAY: return 'success'
         case MarketDataStatus.LOADING: return "primary"
         case MarketDataStatus.DELAYED: return 'warning'
-        case MarketDataStatus.OFFLINE: return 'dange'
+        case MarketDataStatus.OFFLINE: return 'danger'
         default: return 'success'
     }
 }
