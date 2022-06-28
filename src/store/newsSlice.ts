@@ -34,6 +34,12 @@ export const GetNewsManagerDetails = createAsyncThunk('news/GetNewsManagerDetail
     return response.data;  
 })
 
+export const GetNewsSources = createAsyncThunk('news/GetNewsSources', async () => {
+    const baseURL = Constants.BASE_API_REST_URL + `News/Sources`;
+    const response = await axios.get(baseURL);
+    return response.data;  
+})
+
 export const GetNewsSourceDetails = createAsyncThunk('news/GetNewsSourceDetails', async (sourceId: string) => {
     const baseURL = Constants.BASE_API_REST_URL + `News/${sourceId}/Details`;
     const response = await axios.get(baseURL);
@@ -95,11 +101,11 @@ interface State {
 
 const initialState: State = {
     totalNumberOfNewsItems: 0,
-    sourceIds: [],
     earliest: null,
     latest: null,
     numberOfRssFeeds: 0,
     numberOfTwitterFeeds: 0,
+    sourceIds: [],
     newsSources: [],
     newsItems: []
 }
@@ -112,11 +118,13 @@ const slice = createSlice({
         builder
         .addCase(GetNewsManagerDetails.fulfilled, (state, action) => {
             state.totalNumberOfNewsItems = action.payload.totalNumberOfNewsItems
-            state.sourceIds = action.payload.sourceIds
             state.earliest = action.payload.earliest
             state.latest = action.payload.latest
             state.numberOfRssFeeds = action.payload.numberOfRssFeeds
             state.numberOfTwitterFeeds = action.payload.numberOfTwitterFeeds
+        })
+        .addCase(GetNewsSources.fulfilled, (state, action) => {
+            state.sourceIds = action.payload
         })
         .addCase(GetNewsSourceDetails.fulfilled, (state, action) => {
             const newsSource: INewsSource = action.payload as INewsSource;

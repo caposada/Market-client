@@ -69,6 +69,7 @@ export const MarkNotInteresting = createAsyncThunk('gatherer/MarkNotInteresting'
 interface State {
   totalInterestingItemsCount: number
   totalNonInterestingItemsCount: number
+  requestQueueProcessorCount: number
   sourceItems: []
   interestingItemsCount: number
   interestingItems: IInterestingItem[] | null
@@ -83,6 +84,7 @@ interface State {
 const initialState: State = {
   totalInterestingItemsCount: 0,
   totalNonInterestingItemsCount: 0,
+  requestQueueProcessorCount: 0,
   sourceItems: [],
   interestingItemsCount: 0,
   interestingItems: null,
@@ -125,6 +127,7 @@ const slice = createSlice({
       .addCase(GetDetails.fulfilled, (state, action) => {
         state.totalInterestingItemsCount = action.payload.totalInterestingItemsCount
         state.totalNonInterestingItemsCount = action.payload.totalNonInterestingItemsCount
+        state.requestQueueProcessorCount = action.payload.requestQueueProcessorCount
         state.sourceItems = action.payload.sourceItems
       })
       .addCase(GetInterestingItemDetails.fulfilled, (state, action) => {
@@ -166,6 +169,7 @@ export const {
 // in the slice file. For example: `useSelector((state) => state.counter.value)`
 export const SelectTotalInterestingItemsCount = (state : RootState) => state.gatherer.totalInterestingItemsCount;
 export const SelectTotalNonInterestingItemsCount = (state : RootState) => state.gatherer.totalNonInterestingItemsCount;
+export const SelectRequestQueueProcessorCount = (state : RootState) => state.gatherer.requestQueueProcessorCount;
 export const SelectSourceItems = (state : RootState) => state.gatherer.sourceItems;
 export const SelectInterestingItemDetails = (state : RootState) => state.gatherer.interestingItemDetails;
 export const SelectInterestingItemsCount = (state : RootState) => state.gatherer.interestingItemsCount;
