@@ -4,8 +4,6 @@ import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { 
-    SelectMessageCount,
-    SelectMessage,
     SelectIsConnected
 } from '../../store/websocketSlice';
 import { 
@@ -15,12 +13,10 @@ import {
 } from '../../store/marketSlice';
 import { useEffect } from "react";
 import dateFormat from "dateformat";
-import { MarketDataStatus, IMessage } from "../../utils/types";
+import { MarketDataStatus } from "../../utils/types";
 import { getVariantBaseOnMarketDataStatus } from "../../utils/helpers";
 
 export default function Market() {
-    const messageCount = useAppSelector(SelectMessageCount);
-    const message: IMessage | null = useAppSelector(SelectMessage);
     const isConnected = useAppSelector(SelectIsConnected);
     const marketDataStatus = useAppSelector(SelectMarketDataStatus);
     const details = useAppSelector(SelectDetails);
@@ -34,17 +30,6 @@ export default function Market() {
     const nextReady = status !== MarketDataStatus.DELAYED && status !== MarketDataStatus.OFFLINE ? "NOW" : nextReadyTime;
 
     useEffect(refresh, [isConnected, marketDataStatus, dispatch]);
-    useEffect(websocketEvent, [messageCount, message, dispatch]);  
-
-    function websocketEvent() {
-        if (message != null ) {
-            if (message.Root === "Market") {
-                if (message.EventName === "StateChange" && message.Data !== null) {
-                    dispatch(GetMarketDetails());
-                }
-            }
-        }
-    }
 
     function refresh() {
         dispatch(GetMarketDetails());

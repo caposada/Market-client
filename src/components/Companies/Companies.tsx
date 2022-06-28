@@ -13,37 +13,17 @@ import {
     SelectNameStartsWith,
     SelectSymbolStartsWith,
     GetDetails,
-    GetCompanyDetails,
     SetNameStartsWith,
     SetSymbolStartsWith
 } from '../../store/companySlice';
-import { 
-    SelectMessageCount,
-    SelectMessage
-} from '../../store/websocketSlice';
 
 export default function Companies() {
-    const messageCount = useAppSelector(SelectMessageCount);
-    const message = useAppSelector(SelectMessage);
     const numberOfCompanies = useAppSelector(SelectNumberOfCompanies);
     const nameStartsWith = useAppSelector(SelectNameStartsWith);
     const symbolStartsWith = useAppSelector(SelectSymbolStartsWith);
     const dispatch = useAppDispatch();
 
     useEffect(refresh, [dispatch]);
-    useEffect(websocketEvent, [messageCount, message, dispatch]);  
-
-    function websocketEvent() {
-        if (message != null ) {
-            if (message.Root === "Company") {
-                if (message.EventName === "CompanyChanged") {
-                    dispatch(GetCompanyDetails({
-                        symbol: message.Id
-                    }));      
-                }
-              }
-        }
-    }
     
     function refresh() {
         dispatch(GetDetails());

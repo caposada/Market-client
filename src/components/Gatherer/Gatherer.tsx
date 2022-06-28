@@ -13,6 +13,7 @@ import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { 
     SelectTotalInterestingItemsCount,
     SelectTotalNonInterestingItemsCount,
+    SelectRequestQueueProcessorCount,
     SelectSourceItems,
     SelectHasTimeSeries,
     SelectNameStartsWith,
@@ -24,16 +25,11 @@ import {
     SetSymbolStartsWith,
     SetSourceId
 } from '../../store/gathererSlice';
-import { 
-    SelectMessageCount,
-    SelectMessage
-} from '../../store/websocketSlice';
 
 export default function Gatherer() {
-    const messageCount = useAppSelector(SelectMessageCount);
-    const message = useAppSelector(SelectMessage);
     const totalInterestingItemsCount = useAppSelector(SelectTotalInterestingItemsCount);
     const totalNonInterestingItemsCount = useAppSelector(SelectTotalNonInterestingItemsCount);
+    const requestQueueProcessorCount = useAppSelector(SelectRequestQueueProcessorCount);
     const hasTimeSeries = useAppSelector(SelectHasTimeSeries);
     const nameStartsWith = useAppSelector(SelectNameStartsWith);
     const symbolStartsWith = useAppSelector(SelectSymbolStartsWith);
@@ -42,17 +38,6 @@ export default function Gatherer() {
     const dispatch = useAppDispatch();
 
     useEffect(refresh, [dispatch]);
-    useEffect(websocketEvent, [messageCount, message, dispatch]);  
-
-    function websocketEvent() {
-        if (message != null ) {
-            if (message.Root === "Gatherer") {
-                if (message.EventName === "InterestedItemsChanged" && message.Data !== null && message.Data !== "0") {
-                    dispatch(GetDetails());      
-                }
-            }
-        }
-    }
 
     function refresh() {
         dispatch(GetDetails());
@@ -103,6 +88,15 @@ export default function Gatherer() {
                         </Col>
                         <Col md={4}>
                             {totalNonInterestingItemsCount}
+                        </Col>
+                    </Row>
+                    
+                    <Row>
+                        <Col md={8}>
+                            <h5>No. of queued stock data requests pending</h5>
+                        </Col>
+                        <Col md={4}>
+                            {requestQueueProcessorCount}
                         </Col>
                     </Row>
 

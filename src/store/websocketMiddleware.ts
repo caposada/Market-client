@@ -7,6 +7,23 @@ import {
 import Constants from "../utils/constants";
 import { Middleware } from 'redux';
 import { RootState } from '../store';
+import { IMessage } from "../utils/types";
+import companyMessageHandler from "./companyMessageHandler"
+import gathererMessageHandler from "./gathererMessageHandler"
+import marketMessageHandler from "./marketMessageHandler"
+import newsMessageHandler from "./newsMessageHandler"
+
+function ActOnMessage(message: IMessage) {
+  if (message != null ) {
+    switch (message.Root) {
+      case "Company": companyMessageHandler(message); break;
+      case "Gatherer": gathererMessageHandler(message); break;
+      case "GathererInformation": gathererMessageHandler(message); break;
+      case "Market": marketMessageHandler(message); break;
+      case "NewsManager": newsMessageHandler(message); break;
+    }
+  }
+}
 
 const websocketMiddleware: Middleware<{}, RootState> = store => next => action => {
   if (!StartConnecting.match(action)) {
@@ -28,6 +45,9 @@ const websocketMiddleware: Middleware<{}, RootState> = store => next => action =
 
   webSocket.onmessage = (event) => {
     var message = JSON.parse(event.data);
+
+    ActOnMessage(message);
+
     store.dispatch(MessageReceived(message));
   }
  

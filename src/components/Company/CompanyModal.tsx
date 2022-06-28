@@ -11,38 +11,16 @@ import {
     SelectMarketDataStatus,
     ResetData,
     GetQuote,
-    GetTimeSeries,
-    SetMarketDataStatus
+    GetTimeSeries
 } from '../../store/marketSlice';
-import { 
-    SelectMessageCount,
-    SelectMessage 
-} from '../../store/websocketSlice';
 import { useEffect } from "react";
 import { makeRequest, Response } from "../../utils/requests";
 import Constants from "../../utils/constants";
 import CompanyLatest from "./CompanyLatest";
 import MarketDataStatusIndicator from "./MarketDataStatusIndicator";
-import { MarketDataStatus, IMessage } from "../../utils/types";
 
-function getStatus(requestStatusString: string) {
-    switch (requestStatusString) {
-        case "OKAY" : 
-            return MarketDataStatus.OKAY;
-        case "LOADING" : 
-            return MarketDataStatus.LOADING;
-        case "DELAYED" : 
-            return MarketDataStatus.DELAYED;
-        case "OFFLINE" : 
-            return MarketDataStatus.OFFLINE;      
-        default: 
-            return MarketDataStatus.OKAY;
-    }
-}
 
 export default function CompanyModal() {
-    const messageCount = useAppSelector(SelectMessageCount);
-    const message: IMessage | null = useAppSelector(SelectMessage);
     const info = useAppSelector(SelectInfo);  
     const quote = useAppSelector(SelectQuote);  
     const timeSeries = useAppSelector(SelectTimeSeries);  
@@ -52,19 +30,6 @@ export default function CompanyModal() {
     
     useEffect(loadQuote, [info, dispatch]);
     useEffect(loadTimeSeriesData, [info, timeSeriesInterval, dispatch]);
-    useEffect(websocketEvent, [messageCount, message, dispatch]);  
-
-    function websocketEvent() {
-        if (message != null ) {
-            if (message.Root === "Market") {
-                if (message.EventName === "StateChange" && message.Data !== null) {
-                    const status = getStatus(message.Data);
-                    //console.log("status: " + status);
-                    dispatch(SetMarketDataStatus(status));
-                }
-            }
-        }
-    }
 
     function loadQuote() {
         if (info !== null) {
