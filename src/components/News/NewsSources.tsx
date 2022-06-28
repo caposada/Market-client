@@ -1,46 +1,33 @@
 import { useState } from "react";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Tooltip from 'react-bootstrap/Tooltip';
 import NewsSource from "./NewsSource";
-import AddSourceModal from "./AddSourceModal";
+import NewsSourcesControl from "./NewsSourcesControl"
 import { ScrollingContainer } from "../../utils/styling";
-import { ForceUpdateAll } from '../../store/newsSlice';
-import { useAppDispatch } from '../../store/hooks';
+import { 
+  SelectSourceIds,
+  GetNewsSources
+} from '../../store/newsSlice';
+import { useEffect } from "react";
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
 
-type Props = {
-  sourceIds: string[]
-};
-
-export default function NewsSources({ sourceIds } : Props) {  
-  const [show, setShow] = useState(false);
+export default function NewsSources() {  
   const [selectId, setSelectedId] = useState<string | null>(null);
+  const sourceIds = useAppSelector(SelectSourceIds);
   const dispatch = useAppDispatch();
   
-  function updateClicked(e: React.MouseEvent<HTMLButtonElement>) {  
-    e.stopPropagation();   
-    dispatch(ForceUpdateAll());
+  //console.log("render:NewsSources");
+
+  useEffect(refresh, [dispatch]);
+  
+  function refresh() {
+    dispatch(GetNewsSources());
   }
 
   return (
     <div>
-      <h3>
-        Sources ({sourceIds.length}){' '}
-        <OverlayTrigger
-        key="addSource"
-        placement="bottom"
-        overlay={<Tooltip id="tooltip-addSource">Add new source</Tooltip>} >
-          <Button onClick={() => setShow(true)} size="sm"><i className="bi bi-plus-circle"></i></Button>
-        </OverlayTrigger>{' '}
-        <OverlayTrigger
-        key="isPolling"
-        placement="bottom"
-        overlay={<Tooltip id="tooltip-isPolling">Force update for all</Tooltip>} >
-          <Button onClick={updateClicked} size="sm"><i className="bi bi-arrow-left-right"></i></Button>
-        </OverlayTrigger>
-      </h3>
+      <NewsSourcesControl numOfSources={sourceIds.length} />
+
       <ScrollingContainer className="p-1" >
         {
           sourceIds.map((sourceId, index) => {
@@ -57,8 +44,6 @@ export default function NewsSources({ sourceIds } : Props) {
           })
         }
       </ScrollingContainer>    
-      
-      { show === true ?  <AddSourceModal setShow={setShow} /> : <></> }
         
     </div>
   );
