@@ -96,23 +96,6 @@ export type IDataPoint = {
     changePercent: number
 }
 
-export interface ITimeSeries {
-    publishedDate: Date
-    symbol: string
-    validUntil: Date
-    timeStamp: Date
-    interval: Interval
-    dataPoints: IDataPoint[]
-    min: number
-    max: number
-    from: Date
-    to: Date
-    minChangePercent: number
-    maxChangePercent: number
-    lowVolatility: PriceChangeVolatility
-    highVolatility: PriceChangeVolatility
-}
-
 export interface IQuote {
     openingPrice: number
     previousClosingPrice: number
@@ -150,6 +133,36 @@ export interface IFinding {
     rationale: AnalysisRationale
     tokens: IToken[]
 }
+
+export interface ITimeSeries {
+    publishedDate: Date
+    symbol: string
+    validUntil: Date
+    timeStamp: Date
+    interval: Interval
+    dataPoints: IDataPoint[]
+    min: number
+    max: number
+    from: Date
+    to: Date
+    minChangePercent: number
+    maxChangePercent: number
+    lowVolatility: PriceChangeVolatility
+    highVolatility: PriceChangeVolatility
+}
+
+export interface IInterestingItemDetails {
+    id: string
+    text: string
+    publishDate: Date
+    timestamp: Date
+    findings: IFinding[]
+    timeSerieses: ITimeSeries[]
+    lastPoll: Date
+    feedType: FeedType
+    title: string
+    url: string
+};
 
 export interface IInterestingItem {
     id: string
@@ -216,19 +229,6 @@ export interface ISourceItem {
     name: string,
     feedType: FeedType
 }
-
-export interface IInterestingItemDetails {
-    id: string
-    text: string
-    publishDate: Date
-    timestamp: Date
-    findings: IFinding[]
-    timeSerieses: ITimeSeries[]
-    lastPoll: Date
-    feedType: FeedType
-    title: string
-    url: string
-};
 
 export interface IOverview {
     symbol: string
