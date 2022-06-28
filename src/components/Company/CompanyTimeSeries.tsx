@@ -1,6 +1,6 @@
 import Spinner from 'react-bootstrap/Spinner';
 import { ChartCard } from "../../utils/styling";
-import { Parse, Series } from "../../utils/parseData"; 
+import { Parse, MarkSeries, Point } from "../../utils/parseData"; 
 import { Chart } from "react-chartjs-2";
 import 'chartjs-adapter-date-fns';
 import { 
@@ -24,6 +24,7 @@ import {
 } from '../../store/marketSlice';
 import { useMemo } from "react";
 import { Interval, ITimeSeries } from "../../utils/types";
+import dateFormat from "dateformat"
 
 ChartJS.register(
     BarElement, 
@@ -42,7 +43,7 @@ ChartJS.register(
 
 function getLineDataset(
     label: string, 
-    series: Series[], 
+    series: Point[], 
     color: string, 
     fill: string | boolean, 
     hidden: boolean,
@@ -70,15 +71,13 @@ function getLineDataset(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getBarDataset(
     label: string, 
-    series: Series[], 
+    series: Point[], 
     color: string, 
-    fill: string | boolean, 
     hidden: boolean) {
     const dataset = {
         hidden: hidden,
         order: 0,
         type: 'bar' as const,
-        yAxisID: 'y2',
         label: label,
         data: series,
         backgroundColor: color,
@@ -105,10 +104,11 @@ function getUnit(timeSeriesInterval: Interval) {
 type Props = {
     timeSeries: ITimeSeries | null, 
     fromDate?: Date, 
-    toDate?: Date
+    toDate?: Date,
+    markedDates?: Date[] | null
 };
 
-export default function CompanyTimeSeries({ timeSeries, fromDate, toDate }: Props) {  
+export default function CompanyTimeSeries({ timeSeries, fromDate, toDate, markedDates  }: Props) {  
     const timeSeriesInterval = useAppSelector(SelectTimeSeriesInterval);   
 
     // Closing Price
@@ -123,19 +123,30 @@ export default function CompanyTimeSeries({ timeSeries, fromDate, toDate }: Prop
 
     if (timeSeries !== null && closingPriceParseData != null && changePercentParseData != null) {
         
+        const datasets = []
+
         const closingPriceDataset = getLineDataset('Closing', closingPriceParseData?.series, "rgba(100, 0, 100, 0.6)", "start", false, "y"); // Magenta
         const yMin = closingPriceParseData?.min;
         const yMax = closingPriceParseData?.max;
+        datasets.push(closingPriceDataset);
 
         const changePercentDataset = getLineDataset('Change Percent', changePercentParseData?.series, "rgba(0, 0, 0, 1.0)", false, false, "y2"); // Black
         const y2Min = changePercentParseData?.min;
         const y2Max = changePercentParseData?.max;
+        datasets.push(changePercentDataset);
 
-        const datasets = [
-            closingPriceDataset,
-            changePercentDataset
-        ]
-    
+        if (markedDates !== null && markedDates !== undefined) {
+            const series: Point[] = MarkSeries(timeSeries.dataPoints, markedDates, yMax);
+            markedDates.forEach(date => {
+                series.push({
+                    x: date,
+                    y: yMax
+                })
+            })
+            const markedDataset = getBarDataset('Published', series, "rgba(255, 0, 0, 0.6)", false); // Red
+            datasets.push(markedDataset);
+        }
+        
         const chartData = {
             // datasets is an array of objects where each object represents a set of data to display corresponding 
             // to the labels above. for brevity, we'll keep it at one object
@@ -179,6 +190,29 @@ export default function CompanyTimeSeries({ timeSeries, fromDate, toDate }: Prop
                                 legend: {
                                     display: true,
                                     position: "bottom"
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || "";
+                    
+                                            if (context.dataset.label === "Published")
+                                                return "Published: " + dateFormat(context.parsed.x, "dd/mm/yyyy hh:MM:ss tt");
+                                            
+                                            if (label) {
+                                                label += ': ';
+                                            }
+
+                                            if (context.dataset.label === "Closing") {
+                                                if (context.parsed.y !== null) {
+                                                    label += context.parsed.y.toFixed(2);
+                                                }
+                                                return label;
+                                            }
+
+                                            return label += context.parsed.y.toFixed(2);
+                                        }
+                                    }
                                 }
                             }
                         }}

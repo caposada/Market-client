@@ -39,6 +39,7 @@ export default function FindingInfoModal({ details, finding, setFindingInfo }: P
     const newsPublishedDateTime = dateFormat(publishDate, "dd/mm/yyyy hh:MM:ss tt");
     const fromDate = getPreviousDate(publishDate);
     const feedTypeString = FeedType[details.feedType];
+    const markedDates = [publishDate];
 
     const handleClose = () => setFindingInfo(null);
 
@@ -84,7 +85,7 @@ export default function FindingInfoModal({ details, finding, setFindingInfo }: P
                             <h3>
                                 Time Series (Min15)
                             </h3>
-                            <CompanyTimeSeries timeSeries={timeSeries} fromDate={fromDate} />
+                            <CompanyTimeSeries timeSeries={timeSeries} fromDate={fromDate} markedDates={markedDates} />
                         </BorderCol>
                     </Row>
                 </Container> 
