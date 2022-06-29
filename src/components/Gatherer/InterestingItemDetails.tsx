@@ -3,12 +3,12 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
-import CompanyBadge from "../Shared/CompanyBadge"
 import TextInfoModal from "./TextInfoModal"
 import FeedGotoRow from "../Shared/FeedGotoRow"
 import FeedTypeRow from "../Shared/FeedTypeRow"
 import FeedLastPollRow from "../Shared/FeedLastPollRow"
-import FindingInfoModal, { ILocalFinding } from "./FindingInfoModal"
+import FindingInfoModal from "./FindingInfoModal"
+import FindingsList from "./FindingsList"
 import dateFormat from "dateformat"
 import { useAppSelector, useAppDispatch } from '../../store/hooks'
 import { 
@@ -16,39 +16,23 @@ import {
     MarkNotInteresting,
     ResetInterestingItemDetails
 } from '../../store/gathererSlice'
-import { RightJustifiedButton } from "../../utils/styling"
+import { 
+    RightJustifiedButton
+} from "../../utils/styling"
 import { useState } from "react"
+import { IFindingInfo } from "../../utils/types";
 
 export default function InterestingItemDetails() {
     const [breakdownId, setBreakdownId] = useState<string | null>(null);
-    const [findingInfo, setFindingInfo] = useState<ILocalFinding | null>(null);
+    const [findingInfo, setFindingInfo] = useState<IFindingInfo | null>(null);
     const interestingItemDetails = useAppSelector(SelectInterestingItemDetails);
     const dispatch = useAppDispatch();
 
-    function getFindings() {
-        const findings: ILocalFinding[] = [];
-
-        if (interestingItemDetails !== null) {
-            interestingItemDetails.findings.forEach((finding) => {
-                const timeSeries = interestingItemDetails.timeSerieses.find(x => x.symbol === finding.company.symbol);
-                findings.push({
-                    company: finding.company,
-                    confidence: finding.confidence,
-                    timeSeries: timeSeries
-                })
-            });
-        }
-
-        return findings;
-    }
+    //console.log(`render:InterestingItemDetails`);
 
     function showBreakdown() {
         if (interestingItemDetails !== null)
             setBreakdownId(interestingItemDetails.id);
-    }
-
-    function showGraph(finding: ILocalFinding) {
-        setFindingInfo(finding);
     }
 
     function deleteClicked() {
@@ -109,36 +93,12 @@ export default function InterestingItemDetails() {
                     <Row className="mt-3">
                         <h4>Company(s)</h4>
                     </Row>
-                    {
-                        getFindings().map((finding) => {
-                            if (finding.timeSeries) {
-                                return (    
-                                    <Row key={finding.company.symbol}>            
-                                        <Col md={4}>
-                                            <CompanyBadge company={finding.company} confidence={finding.confidence} />
-                                        </Col>  
-                                        <Col md={6}>
-                                            {finding.company.name}
-                                        </Col>   
-                                        <Col md={2}>                
-                                            <RightJustifiedButton onClick={() => showGraph(finding)} size="sm"><i className="bi bi-graph-up-arrow"></i></RightJustifiedButton>
-                                        </Col>
-                                    </Row> 
-                                )
-                            } else {
-                                return (   
-                                    <Row key={finding.company.symbol}>              
-                                        <Col md={4}>
-                                            <CompanyBadge company={finding.company} confidence={finding.confidence} />
-                                        </Col>                           
-                                        <Col md={8}>
-                                            {finding.company.name}
-                                        </Col>
-                                    </Row>                                    
-                                )
-                            }
-                        })
-                    }
+
+                    <Row>
+                        <FindingsList 
+                        details={interestingItemDetails} 
+                        setFindingInfo={setFindingInfo} />
+                    </Row>
 
                     <Row className="mt-3">
                         <h4>Source</h4>
@@ -171,8 +131,7 @@ export default function InterestingItemDetails() {
 
                 { findingInfo !== null ? 
                 <FindingInfoModal 
-                finding={findingInfo} 
-                details={interestingItemDetails} 
+                findingInfo={findingInfo} 
                 setFindingInfo={setFindingInfo} /> : 
                 <></> }
             </div>  

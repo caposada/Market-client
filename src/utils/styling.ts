@@ -26,6 +26,12 @@ export const ScrollingContainer = styled(Container)`
     border: 1px solid grey;
 `;
 
+export const ScrollingBorderlessContainer = styled(Container)`
+  height: ${props => props.height || "300px"};
+  overflow-y:scroll;
+  overflow-x:hidden;
+`;
+
 export const RightJustifiedButton = styled(Button)`
     float: right;
     margin-left: 2px;

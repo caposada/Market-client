@@ -34,7 +34,7 @@ export default function NewsSource({ id, isSelected, onSelection } : Props) {
   const dispatch = useAppDispatch();
   const [confirmationShow, setConfirmationShow] = useState(false);
   
-  console.log(`render:NewsSource [${id}]`);
+  //console.log(`render:NewsSource [${id}]`);
 
   useEffect(refresh, [id, dispatch]);  
 

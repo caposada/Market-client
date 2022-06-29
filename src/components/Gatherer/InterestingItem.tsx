@@ -36,9 +36,9 @@ export default function InterestingItem({ interestingItem, isSelected, onSelecti
         onClick={cardClicked} >
             <Card.Header>
                 {
-                    interestingItem.findings.map((finding) => {
+                    interestingItem.findings.map((finding, index) => {
                         return (
-                            <span key={finding.company.symbol}>
+                            <span key={index}>
                                 <CompanyBadge company={finding.company} confidence={finding.confidence} />{' '}                                
                             </span>
                         );

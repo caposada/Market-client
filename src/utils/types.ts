@@ -235,3 +235,13 @@ export interface IOverview {
     lastUpdated: Date
     overviewDictionary: { [key: string]: string; }
 }
+
+export interface IFindingInfo {
+    title: string
+    text: string
+    publishDate: Date
+    feedType: FeedType
+    confidence: AnalysisConfidence
+    company: ICompany
+    timeSeries: ITimeSeries
+}
